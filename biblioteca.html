@@ -1,0 +1,233 @@
+<head>
+</head>
+<style>
+    svg {
+        border: 1px solid #aaaaaa;
+    }
+</style>
+<body class="chrome chrome57" style="position: relative; min-height: 100%; top: 0px;">
+    <div id="svgEle"></div>
+    <canvas id="mycanvas" height="800" width="600"></canvas>
+</body>
+
+<script src="d3/d3.v3.min.js"></script>
+<script>
+
+var width = 450,
+    height = 450;
+var jsonCircles = [{ "x_axis": 30, "y_axis": 30, "radius": 17, "color" : "green" },
+    { "x_axis": 10, "y_axis": 20, "radius": 30, "color" : "red"},
+    { "x_axis": 50, "y_axis": 30, "radius": 10, "color" : "red"},
+    { "x_axis": 80, "y_axis": 40, "radius": 15, "color" : "red"},
+    { "x_axis": 130, "y_axis": 60, "radius": 5, "color" : "red"},
+    { "x_axis": 180, "y_axis": 80, "radius": 25, "color" : "red"},
+    { "x_axis": 220, "y_axis": 100, "radius": 30, "color" : "red"},
+    { "x_axis": 280, "y_axis": 150, "radius": 20, "color" : "red"}
+   ];
+
+var jsonCircles1 = [{ "x_axis": 30, "y_axis": 30, "radius": 15, "color" : "green" },
+   { "x_axis": 70, "y_axis": 70, "radius": 10, "color" : "purple"},
+   { "x_axis": 110, "y_axis": 100, "radius": 5, "color" : "red"}];
+
+function drawSvg() {
+    return d3
+        .select(document.getElementById('svgEle'))
+        .append("svg")
+        .attr("width", width)
+        .attr("height", height);
+}
+
+var svg = drawSvg();
+
+var initialUniqueCircle = svg.append("circle")
+    .style("stroke", "gray")
+    .attr("fill", "#cccccc")
+    .attr("r", 30)
+    .attr("cx", width / 2)
+    .attr("cy", 0);
+
+initialUniqueCircle
+    .transition()
+    .attr("fill", "red")
+    .duration(700)
+    .call(moveToCenter)
+    .transition()
+    .call(fadeAway)
+    .duration(600);
+
+svg
+    .selectAll("circle")
+    .data(jsonCircles)
+    .enter()
+    .append("circle")
+    .attr("r", 0)
+    .transition()
+    .duration(2500)
+    .call(draw)
+    .call(fadeIn);
+
+    // .data(jsonCircles)
+    // .exit()
+    // .remove();
+    // .data(jsonCircles1)
+    // .transition()
+    // .attr("fill", "red")
+    // .duration(2000)
+    // .call(draw);
+
+function fadeAway() {
+    this.attr("r", 0);
+};
+
+function fadeIn() {
+    this.attr("r", function (d) {
+        return d.radius;
+    });
+};
+
+function moveToCenter() {
+    this.attr("cy", height / 2);
+};
+
+
+function draw() {
+    this.attr("cx", function (d, i) {
+        return d.x_axis;
+    })
+    .attr("cy", function (d, i) {
+        return d.x_axis;
+    });
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    (function (window) {
+        //I recommend this
+        'use strict';
+
+        function createDroplet() {
+            console.log('create droplet called');
+            var dropObj = {},
+                canvasHeight = document.getElementById('mycanvas') ? document.getElementById('mycanvas').height : 0;
+            dropObj.createDrop = function (options) {
+                var x = options.x;
+                var y = options.y;
+                var diagonally = options.diagonally;
+                var canvas = document.getElementById("mycanvas");
+                var ctx = canvas.getContext('2d');
+                canvas.width = 600;
+                canvas.height = 600;
+                canvas.style.border = "1px solid black";
+
+                ctx.save();
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+                ctx.fillStyle = "orange";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fill();
+
+                ctx.restore();
+
+                if (options.diagonally) {
+                    options.x = options.x + 2;
+                } else if (options.reverseDiagonally) {
+                    options.x = options.x - 2;
+                }
+
+                ctx.fillStyle = "blue";
+                ctx.moveTo(options.x - 15, options.y);
+                ctx.lineTo(options.x, options.y - 30);
+                ctx.lineTo(options.x + 15, options.y);
+                ctx.arc(options.x, options.y, 15, 110, Math.PI);
+
+                ctx.closePath();
+
+                ctx.fill();
+
+                // if (options.encircle) {
+                //     options.y = options.y + 3;
+                // } else {
+                //     options.y = options.y - 3;
+                // }
+
+                if (y <= canvasHeight - 10) {
+                    var m = setTimeout(function () {
+                        console.log(options);
+                        options.y = options.y + 3;
+                        dropObj.createDrop(options);
+                    }, 70);
+                } 
+                // else if (options.encircle) {
+                //     options.y = canvasHeight - 10;
+                //     dropObj.createDrop(options);
+                // } else {
+                //     options.y = 10;
+                //     dropObj.createDrop(options);
+                // }
+            }
+            console.log('dropObj');
+            console.log(dropObj);
+            return dropObj;
+        }
+        //define globally if it doesn't already exist
+        console.log(typeof (droplet))
+        if (typeof (window.droplet) === 'undefined') {
+            window.droplet = createDroplet();
+            console.log('window.droplet');
+            console.log(window.droplet);
+        } else {
+            console.log("Library already defined.");
+        }
+    })(window);
+
+
+
+    //document.addEventListener("DOMContentLoaded", function() {
+    //	createDrop(4, 110);
+    //});
+
+function convertExceltoJSON() {
+    var url = "test.xlsx";
+
+    /* set up async GET request */
+    var req = new XMLHttpRequest();
+    req.open("GET", url, true);
+    req.responseType = "arraybuffer";
+
+    req.onload = function(e) {
+      var data = new Uint8Array(req.response);
+      var workbook = XLSX.read(data, {type:"array"});
+
+      /* DO SOMETHING WITH workbook HERE */
+
+        var first_sheet_name = workbook.SheetNames[0];
+        var address_of_cell = 'A1';
+
+        /* Get worksheet */
+        var worksheet = workbook.Sheets[first_sheet_name];
+        alert(XLSX.utils.sheet_to_json(worksheet));
+        console.log(XLSX.utils.sheet_to_json(worksheet));
+    }
+
+    req.send();
+}
+
+
+
+
+</script>
